@@ -1,0 +1,11 @@
+{
+  "name": "Private_Blockchain",
+  "packageManager": "yarn@3.2.0",
+  "dependencies": {
+    "bitcoinjs-message": "^2.2.0",
+    "crypto-js": "^4.1.1",
+    "express": "^4.17.3",
+    "hex2ascii": "^0.0.3",
+    "morgan": "^1.10.0"
+  }
+}
