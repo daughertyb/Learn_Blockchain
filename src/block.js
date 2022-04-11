@@ -37,15 +37,19 @@ class Block {
      */
     validate() {
         let self = this;
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             // Save in auxiliary variable the current block hash
-                                            
+            let currentHash = self.hash;
             // Recalculate the hash of the Block
+            const hashDigest = sha256(JSON.stringify(self)).toString;
             // Comparing if the hashes changed
-            // Returning the Block is not valid
-            
-            // Returning the Block is valid
-
+            if (currentHash == hashDigest) {
+                // Returning the Block is valid
+                resolve(true);
+            } else {
+                // Returning the Block is not valid
+                reject(false);
+            }
         });
     }
 
@@ -59,14 +63,22 @@ class Block {
      *     or Reject with an error.
      */
     getBData() {
-        // Getting the encoded data saved in the Block
-        // Decoding the data to retrieve the JSON representation of the object
-        // Parse the data to an object to be retrieve.
-
-        // Resolve with the data if the object isn't the Genesis block
-
+        let self = this;
+        return new Promise(async (resolve, reject) => {
+            // Getting the encoded data saved in the Block
+            let encodedData = this.body;
+            // Decoding the data to retrieve the JSON representation of the object
+            let decodedData = hex2ascii(encodedData);
+            // Parse the data to an object to be retrieve.
+            let dataObj = JSON.parse(decodedData);
+            // Resolve with the data if the object isn't the Genesis block
+            if (dataObj && self.height != 0) {
+                resolve(dataObject);
+            } else {
+                reject(Error("The Block has no data."))
+            }
+        });
     }
-
 }
 
 module.exports.Block = Block;                    // Exposing the Block class as a module
