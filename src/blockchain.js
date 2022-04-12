@@ -63,8 +63,20 @@ class Blockchain {
      */
     _addBlock(block) {
         let self = this;
-        return new Promise(async (resolve, reject) => {
-           
+        return new Promise(async(resolve, reject) => {
+            block.height = self.height++;
+            block.time = new Date().getTime().toString().slice(0, -3);
+            if (self.chain.length > 0) {
+                block.previousBlockHash = self.chain[self.height].hash;
+            }
+            block.hash = SHA256(JSON.stringify(block)).toString();
+            self.chain.push(block);
+            self.height += 1;
+            if (self.chain[self.height] == block) {
+                resolve(block);
+            } else {
+                reject(Error("Block was not added."));
+            }
         });
     }
 
@@ -78,7 +90,20 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve) => {
-            
+            let time = parseInt(message.split(':')[1]);
+            let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+
+            if (time > currentTime - 300000) {
+                if (bitcoinMessage.verify(message, address, signature)) {
+                    let block = new BlockClass.Block({ "owner": address, "star": star });
+                    await self._addBlock(block);
+                    resolve(block);
+                } else {
+                    reject(Error("Block message not verified."))
+                }
+            } else {
+                reject(Error("Block was not added due to timeout."));
+            }
         });
     }
 
@@ -101,8 +126,21 @@ class Blockchain {
      */
     submitStar(address, message, signature, star) {
         let self = this;
-        return new Promise(async (resolve, reject) => {
-            
+        return new Promise(async(resolve, reject) => {
+            let time = parseInt(message.split(':')[1]);
+            let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+
+            if (time > currentTime - 300000) {
+                if (bitcoinMessage.verify(message, address, signature)) {
+                    let block = new BlockClass.Block({ "owner": address, "star": star });
+                    await self._addBlock(block);
+                    resolve(block);
+                } else {
+                    reject(Error("Block message not verified."))
+                }
+            } else {
+                reject(Error("Block was not added due to timeout."));
+            }
         });
     }
 
@@ -114,8 +152,13 @@ class Blockchain {
      */
     getBlockByHash(hash) {
         let self = this;
-        return new Promise((resolve, reject) => {
-           
+        return new Promise(async(resolve, reject) => {
+            let block = self.chain.filter(p => p.hash === hash)[0];
+            if (block) {
+                resolve(block);
+            } else {
+                resolve(null);
+            }
         });
     }
 
