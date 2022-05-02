@@ -63,8 +63,8 @@ class Blockchain {
      */
     _addBlock(block) {
         let self = this;
-        return new Promise(async(resolve, reject) => {
-            block.height = self.height++;
+        return new Promise(async (resolve, reject) => {
+            block.height = self.height + 1;
             block.time = new Date().getTime().toString().slice(0, -3);
             if (self.chain.length > 0) {
                 block.previousBlockHash = self.chain[self.height].hash;
@@ -89,7 +89,7 @@ class Blockchain {
      * @param {*} address 
      */
     requestMessageOwnershipVerification(address) {
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
             let time = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
 
@@ -126,7 +126,7 @@ class Blockchain {
      */
     submitStar(address, message, signature, star) {
         let self = this;
-        return new Promise(async(resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             let time = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
 
@@ -152,7 +152,7 @@ class Blockchain {
      */
     getBlockByHash(hash) {
         let self = this;
-        return new Promise(async(resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             let block = self.chain.filter(p => p.hash === hash)[0];
             if (block) {
                 resolve(block);
@@ -209,4 +209,4 @@ class Blockchain {
 
 }
 
-module.exports.Blockchain = Blockchain;   
+module.exports.Blockchain = Blockchain;
