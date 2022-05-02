@@ -38,16 +38,14 @@ class Block {
     validate() {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            // Save in auxiliary variable the current block hash
             let currentHash = self.hash;
-            // Recalculate the hash of the Block
-            const hashDigest = sha256(JSON.stringify(self)).toString;
-            // Comparing if the hashes changed
-            if (currentHash == hashDigest) {
-                // Returning the Block is valid
+            // Recalculate hash and confirm validity
+            const newHash = sha256(JSON.stringify(self)).toString;
+            if (currentHash == newHash) {
+                // Block is valid
                 resolve(true);
             } else {
-                // Returning the Block is not valid
+                // Block is not valid
                 reject(false);
             }
         });
@@ -56,7 +54,6 @@ class Block {
     /**
      *  Auxiliary Method to return the block body (decoding the data)
      *  Steps:
-     *  
      *  1. Use hex2ascii module to decode the data
      *  2. Because data is a javascript object use JSON.parse(string) to get the Javascript Object
      *  3. Resolve with the data and make sure that you don't need to return the data for the `genesis block` 
@@ -67,15 +64,15 @@ class Block {
         return new Promise(async (resolve, reject) => {
             // Getting the encoded data saved in the Block
             let encodedData = this.body;
-            // Decoding the data to retrieve the JSON representation of the object
+            // Decode data to retrieve the JSON representation of the object
             let decodedData = hex2ascii(encodedData);
-            // Parse the data to an object to be retrieve.
+            // Parse data to an object to be retrieved
             let dataObj = JSON.parse(decodedData);
             // Resolve with the data if the object isn't the Genesis block
             if (dataObj && self.height != 0) {
                 resolve(dataObject);
             } else {
-                reject(Error("The Block has no data."))
+                reject(Error("No Data - This is The Genesis Block"))
             }
         });
     }
