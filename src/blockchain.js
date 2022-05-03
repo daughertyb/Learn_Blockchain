@@ -34,7 +34,7 @@ class Blockchain {
      * Passing as a data `{data: 'Genesis Block'}`
      */
     async initializeChain() {
-        if( this.height === -1){
+        if(this.height === -1){
             let block = new BlockClass.Block({data: 'Genesis Block'});
             await this._addBlock(block);
         }
@@ -99,7 +99,7 @@ class Blockchain {
                     await self._addBlock(block);
                     resolve(block);
                 } else {
-                    reject(Error("Block message not verified."))
+                    reject(Error("Block message not verified."));
                 }
             } else {
                 reject(Error("Block was not added due to timeout."));
@@ -157,9 +157,9 @@ class Blockchain {
             if (block) {
                 resolve(block);
             } else {
-                resolve(null);
+                reject(Error("block with hash " + hash + " does not exist"));
             }
-        });
+        }).catch((e) => console.log(e));
     }
 
     /**
@@ -169,14 +169,14 @@ class Blockchain {
      */
     getBlockByHeight(height) {
         let self = this;
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             let block = self.chain.filter(p => p.height === height)[0];
-            if(block){
+            if (block) {
                 resolve(block);
             } else {
-                resolve(null);
+                reject(Error("block with height " + height + " does not exist"));
             }
-        });
+        }).catch((e) => console.log(e));
     }
 
     /**
@@ -185,12 +185,22 @@ class Blockchain {
      * Remember the star should be returned decoded.
      * @param {*} address 
      */
-    getStarsByWalletAddress (address) {
+    getStarsByWalletAddress(address) {
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
-            
-        });
+            for (let block of self.chain) {
+                let data = block.getBData();
+                if (data.address === address) {
+                    stars.push(data);
+                }
+            }
+            if (stars != []) {
+                resolve(stars);
+            } else {
+                reject(Error("No Stars Found For Address " + address));
+            }
+        }).catch((e) => console.log(e));
     }
 
     /**
@@ -203,10 +213,32 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            
+            for (let block of self.chain) {
+                if (await block.validate()) {
+                    let blockHeight = block.height;
+                    if (blockHeight > 0) {
+                        let previousBlock = await this.getBlockByHeight((blockHeight - 1));
+                        //2. Each Block should check the with the previousBlockHash
+                        if (block.previousBlockHash !== previousBlock.hash) {
+                            errorLog.push(`Invalid Block hash at height: ${block.height}$`)
+                        }
+                    }
+
+                } else {
+                    errorLog.push("Block not valid");
+                }
+
+            } if (errorLog != []) {
+                resolve(errorLog);
+            } else {
+                reject(Error("No Errors Found"));
+            }
+
+        }).catch(error => {
+            console.error(error)
         });
     }
 
 }
 
-module.exports.Blockchain = Blockchain;
+module.exports.Blockchain = Blockchain;   
