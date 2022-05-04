@@ -34,8 +34,8 @@ class Blockchain {
      * Passing as a data `{data: 'Genesis Block'}`
      */
     async initializeChain() {
-        if(this.height === -1){
-            let block = new BlockClass.Block({data: 'Genesis Block'});
+        if (this.height === -1) {
+            let block = new BlockClass.Block({ data: 'Genesis Block' });
             await this._addBlock(block);
         }
     }
@@ -75,9 +75,9 @@ class Blockchain {
             if (self.chain[self.height] == block) {
                 resolve(block);
             } else {
-                reject(Error("Block was not added."));
+                reject(Error("Block Was Not Successfully Added"));
             }
-        });
+        }).catch((e) => console.log(e));
     }
 
     /**
@@ -90,20 +90,8 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise(async (resolve) => {
-            let time = parseInt(message.split(':')[1]);
-            let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
-
-            if (time > currentTime - 300000) {
-                if (bitcoinMessage.verify(message, address, signature)) {
-                    let block = new BlockClass.Block({ "owner": address, "star": star });
-                    await self._addBlock(block);
-                    resolve(block);
-                } else {
-                    reject(Error("Block message not verified."));
-                }
-            } else {
-                reject(Error("Block was not added due to timeout."));
-            }
+            let message = `${address}:${new Date().getTime().toString().slice(0, -3)}:starRegistry`;
+            resolve(message);
         });
     }
 
@@ -129,19 +117,18 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             let time = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
-
             if (time > currentTime - 300000) {
                 if (bitcoinMessage.verify(message, address, signature)) {
                     let block = new BlockClass.Block({ "owner": address, "star": star });
                     await self._addBlock(block);
                     resolve(block);
                 } else {
-                    reject(Error("Block message not verified."))
+                    reject(Error("Block Message Not Verified"))
                 }
             } else {
-                reject(Error("Block was not added due to timeout."));
+                reject(Error("Block Not Added Due To Timeout"));
             }
-        });
+        }).catch((e) => console.log(e));
     }
 
     /**
@@ -188,14 +175,14 @@ class Blockchain {
     getStarsByWalletAddress(address) {
         let self = this;
         let stars = [];
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             for (let block of self.chain) {
-                let data = block.getBData();
-                if (data.address === address) {
+                let data = await block.getBData();
+                if (data.owner === address) {
                     stars.push(data);
                 }
             }
-            if (stars != []) {
+            if (stars !== []) {
                 resolve(stars);
             } else {
                 reject(Error("No Stars Found For Address " + address));
@@ -215,25 +202,23 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             for (let block of self.chain) {
                 if (await block.validate()) {
-                    let blockHeight = block.height;
-                    if (blockHeight > 0) {
-                        let previousBlock = await this.getBlockByHeight((blockHeight - 1));
-                        //2. Each Block should check the with the previousBlockHash
+                    let height = block.height;
+                    if (height > 0) {
+                        let previousBlock = await this.getBlockByHeight((height - 1));
                         if (block.previousBlockHash !== previousBlock.hash) {
-                            errorLog.push(`Invalid Block hash at height: ${block.height}$`)
+                            errorLog.push(`Invalid Block Hash at Height: ${block.height}$`)
                         }
                     }
 
                 } else {
-                    errorLog.push("Block not valid");
+                    errorLog.push("Block Not Valid");
                 }
 
-            } if (errorLog != []) {
+            } if (errorLog !== []) {
                 resolve(errorLog);
             } else {
                 reject(Error("No Errors Found"));
             }
-
         }).catch(error => {
             console.error(error)
         });
@@ -241,4 +226,4 @@ class Blockchain {
 
 }
 
-module.exports.Blockchain = Blockchain;   
+module.exports.Blockchain = Blockchain;
