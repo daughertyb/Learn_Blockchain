@@ -1,10 +1,4 @@
 "address":"1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN"
-"signature":
+"signature":"HPWuyxdYgORaPbxJKuVfu71ABNVdEIvaKhw6m56WQK70/w+YwAeLmI1IaKxcpxXj8Pz6SpA8oEGdVinLfKdzEsU="
 "message":"1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN:1651769809:starRegistry"
 
------BEGIN BITCOIN SIGNED MESSAGE-----
-1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN:1651769809:starRegistry
------BEGIN SIGNATURE-----
-1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN
-HPWuyxdYgORaPbxJKuVfu71ABNVdEIvaKhw6m56WQK70/w+YwAeLmI1IaKxcpxXj8Pz6SpA8oEGdVinLfKdzEsU=
------END BITCOIN SIGNED MESSAGE-----
