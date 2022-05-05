@@ -38,6 +38,7 @@ class Block {
         let self = this;
         return new Promise(async (resolve, reject) => {
             let currentHash = self.hash;
+            self.hash = null;
             // Recalculate hash and confirm validity
             const newHash = sha256(JSON.stringify(self)).toString;
             if (currentHash == newHash) {
