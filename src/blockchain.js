@@ -61,7 +61,7 @@ class Blockchain {
      * Note: the symbol `_` in the method name indicates in the javascript convention 
      * that this method is a private method. 
      */
-    _addBlock(block) {
+    async _addBlock(block) {
         let self = this;
         let validate = [];
         return new Promise(async (resolve, reject) => {
@@ -69,16 +69,15 @@ class Blockchain {
             block.time = new Date().getTime().toString().slice(0, -3);
             if (self.chain.length > 0) {
                 block.previousBlockHash = self.chain[self.height].hash;
-                validate = self.validateChain;
+                validate = await self.validateChain;
             }
             if (validate.length === 0) {
                 block.hash = SHA256(JSON.stringify(block)).toString();
                 self.chain.push(block);
                 self.height += 1;
-                resolve(block);
-            }
-            if (self.chain[self.height] == block) {
-                resolve(block);
+                if (self.chain[self.height] == block) {
+                    resolve(block);
+                }
             } else {
                 reject(Error("Block Was Not Successfully Added"));
             }
@@ -201,20 +200,25 @@ class Blockchain {
      * 1. You should validate each block using `validateBlock`
      * 2. Each Block should check the with the previousBlockHash
      */
-    validateChain() {
+    async validateChain() {
         let self = this;
         let errorLog = [];
-        return new Promise(async (resolve, reject) => {
-            self.chain.forEach(block => {
-                if (!block.validate()) {
-                    errorLog.push("Invalid Block " + block);
+        try {
+            return new Promise(async (resolve, reject) => {
+                self.chain.forEach(block => {
+                    if (!block.validate()) {
+                        errorLog.push("Invalid Block " + block);
+                    }
+                });
+                resolve(errorLog);
+                if (errorLog.length !== []) {
+                    reject(Error("Unable To Validate Chain"));
                 }
             });
-            resolve(errorLog);
-            if (errorLog.length !== []) {
-                reject(Error("Unable To Validate Chain"));
-            }
-        }).catch((e) => console.log(e));
+        }
+        catch (e) {
+            return console.log(e);
+        }
     }
 }
 
